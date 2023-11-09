@@ -1,11 +1,11 @@
 # gambit
-This app is still in development. The app is currently hosted at [gambitplo.com](https://gambitplo.com/).
+[GambitPLO.com](https://gambitplo.com/) is up and running, but is still under development.
 
 ## Description
-This app is a tool for learning Pot Limit Omaha opening ranges. Visualize a situations opening range using "Heatmaps" or test your knowledge of a situation with a quiz.
+A tool for learning Pot Limit Omaha opening ranges. Visualize a situations opening range using "Heatmaps" or test your knowledge of a situation with a quiz.
 
 ## Process and Data
-The data for the strategy was obtained by running large simulations ([MonkerSolver](https://monkersolver.com/)) and then grouping the results into useful categories.
+The data for the strategy was obtained by running large simulations ([MonkerSolver](https://monkerware.com/solver.html)) and then grouping the results into categories that would be useful for learning.
 
 ### Steps
 1. Design simulations
