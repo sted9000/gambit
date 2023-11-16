@@ -1,3 +1,4 @@
+<!--Note: These are presentational components, so they don't have any data or methods. They just receive props and emit events.-->
 <template>
   <div class="relative inline-block text-left mx-4">
     <label for="options" class="block text-sm font-medium text-gray-700">{{
@@ -5,8 +6,8 @@
     }}</label>
     <select
       id="options"
-      v-model="selectedOption"
-      @change="optionChanged"
+      :value="value"
+      @change.stop="onChange($event)"
       class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
     >
       <option disabled value="">Please select one</option>
@@ -29,23 +30,15 @@ export default {
     name: String,
     options: Array,
     disabledOptions: Array,
-    initialValue: String,
-  },
-  data() {
-    return {
-      selectedOption: "",
-    };
+    value: String,
   },
   methods: {
-    optionChanged() {
-      this.$emit("optionChanged", this.selectedOption);
+    onChange(event) {
+      this.$emit("change", event.target.value);
     },
     isDisabled(option) {
       return this.disabledOptions.includes(option);
     },
-  },
-  mounted() {
-    this.selectedOption = this.initialValue;
   },
 };
 </script>

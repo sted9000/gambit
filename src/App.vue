@@ -35,5 +35,19 @@ export default {
       toggle,
     };
   },
+  methods: {
+    async sendPostRequest() {
+      try {
+        const response = await axios.post(
+          "http://localhost:8080/test",
+          { message: "Hello World" },
+          { headers: { "Content-Type": "application/json" } }
+        );
+        console.log(response.data);
+      } catch (error) {
+        console.error("There was an error", error);
+      }
+    },
+  },
 };
 </script>

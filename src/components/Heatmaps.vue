@@ -2,37 +2,39 @@
   <div class="flex justify-center my-4">
     <HMSelect
       name="Position"
-      :options="positions"
+      :options="positionsArray"
       :disabledOptions="disabledPositions"
-      @optionChanged="positionChanged"
-      :initialValue="position"
+      :value="position"
+      @change="handlePositionChange"
     />
     <HMSelect
       name="Showdown Cards"
-      :options="sdCombos"
-      :disabledOptions="disabledCombos"
-      @optionChanged="comboChanged"
-      :initialValue="combo"
+      :options="showdownCardsArray"
+      :disabledOptions="disabledShowdownCards"
+      :value="showdownCards"
+      @change="handleComboChange"
     />
     <HMSelect
       name="Simple Suitedness"
-      :options="simpleSuitedness"
+      :options="simpleSuitednessArray"
       :disabledOptions="disabledSimpleSuitedness"
-      @optionChanged="suitChanged"
-      :initialValue="suit"
+      :value="simpleSuit"
+      @change="handleSuitChange"
     />
     <HMSelect
       name="Detailed Suitedness"
-      :options="detailedSuitedness"
+      :options="detailedSuitednessArray"
       :disabledOptions="disabledDetailedSuitedness"
-      @optionChanged="detailedSuitChanged"
-      :initialValue="detailedSuit"
+      :value="detailedSuit"
+      @change="handleDetailChange"
     />
   </div>
 
+  <button @click="sendPostRequest">Send Post Request</button>
+
   <div class="flex justify-center my-8">
-    <div v-if="mapSelected" :style="gridContainerStyle">
-      <div v-for="(row, rowIndex) in map" :key="rowIndex" :style="rowStyle">
+    <div :style="gridContainerStyle">
+      <div v-for="(row, rowIndex) in heatmap" :key="rowIndex" :style="rowStyle">
         <div
           v-for="(col, colIndex) in row"
           :key="colIndex"
@@ -56,30 +58,27 @@
 import ComboCell from "./ComboCell.vue";
 import Legend from "./Legend.vue";
 import HMSelect from "./HMSelect.vue";
+import axios from "axios";
 
 export default {
   name: "Header",
   components: { HMSelect, ComboCell, Legend },
   data() {
     return {
-      numRows: 13,
-      numCols: 13,
-      windowWidth: window.innerWidth / 2,
-      positions: [
+      // set options for position, combo, simple suitedness, and detailed suitedness
+      positionsArray: [
         { label: "EP", value: 0 },
         { label: "MP", value: 1 },
         { label: "CO", value: 2 },
         { label: "BTN", value: 3 },
         { label: "SB", value: 4 },
       ],
-      disabledPositions: ["EP", "CO", "BTN", "SB"],
-      position: "1",
-      sdCombos: [
+      showdownCardsArray: [
         { label: "AA", value: "AA" },
         { label: "AK", value: "AK" },
         { label: "AQ", value: "AQ" },
         { label: "AJ", value: "AJ" },
-        { label: "AT", value: "AJ" },
+        { label: "AT", value: "AT" },
         { label: "A9", value: "A9" },
         { label: "A8", value: "A8" },
         { label: "A7", value: "A7" },
@@ -167,113 +166,14 @@ export default {
         { label: "32", value: "32" },
         { label: "22", value: "22" },
       ],
-      disabledCombos: [
-        "AA",
-        "AJ",
-        "AT",
-        "A9",
-        "A8",
-        "A7",
-        "A6",
-        "A5",
-        "A4",
-        "A3",
-        "A2",
-        "KK",
-        "KQ",
-        "KJ",
-        "KT",
-        "K9",
-        "K8",
-        "K7",
-        "K6",
-        "K5",
-        "K4",
-        "K3",
-        "K2",
-        "QQ",
-        "QJ",
-        "QT",
-        "Q9",
-        "Q8",
-        "Q7",
-        "Q6",
-        "Q5",
-        "Q4",
-        "Q3",
-        "Q2",
-        "JJ",
-        "JT",
-        "J9",
-        "J8",
-        "J7",
-        "J6",
-        "J5",
-        "J4",
-        "J3",
-        "J2",
-        "TT",
-        "T9",
-        "T8",
-        "T7",
-        "T6",
-        "T5",
-        "T4",
-        "T3",
-        "T2",
-        "99",
-        "98",
-        "97",
-        "96",
-        "95",
-        "94",
-        "93",
-        "92",
-        "88",
-        "87",
-        "86",
-        "85",
-        "84",
-        "83",
-        "82",
-        "77",
-        "76",
-        "75",
-        "74",
-        "73",
-        "72",
-        "66",
-        "65",
-        "64",
-        "63",
-        "62",
-        "55",
-        "54",
-        "53",
-        "52",
-        "44",
-        "43",
-        "42",
-        "33",
-        "32",
-        "22",
-      ],
-      combo: "AK",
-      simpleSuitedness: [
+      simpleSuitednessArray: [
         { label: "Double Suited", value: "ds" },
         { label: "Single Suited", value: "ss" },
         { label: "Three to suit", value: "3s" },
         { label: "Four to suit", value: "4s" },
         { label: "Rainbow", value: "rb" },
       ],
-      disabledSimpleSuitedness: [
-        "Double Suited",
-        "Three to suit",
-        "Four to suit",
-        "Rainbow",
-      ],
-      suit: "ss",
-      detailedSuitedness: [
+      detailedSuitednessArray: [
         { label: "wxwx", value: "wxwx" },
         { label: "wxxw", value: "wxxw" },
         { label: "wwxy", value: "wwxy" },
@@ -289,286 +189,83 @@ export default {
         { label: "wwww", value: "wwww" },
         { label: "wxyz", value: "wxyz" },
       ],
-      disabledDetailedSuitedness: [
-        "wxwx",
-        "wxxw",
-        "wwxy",
-        "wxwy",
-        "wxxy",
-        "wxyw",
-        "wxyy",
-        "wwwx",
-        "wwxw",
-        "wxww",
-        "wxxx",
-        "wwww",
-        "wxyz",
-      ],
-      detailed_suits: {
+
+      // user selected options for position, combo, simple suitedness, and detailed suitedness
+      position: "1",
+      showdownCards: "AK",
+      simpleSuit: "ss",
+      detailedSuit: "wxyx",
+
+      // arrays of detailed suitedness for respective simple suitedness
+      simpleDetailArray: {
         ds: ["wxwx", "wxxw"], // 'wwxx'
         ss: ["wwxy", "wxwy", "wxxy", "wxyw", "wxyx", "wxyy"],
         "3s": ["wwwx", "wwxw", "wxww", "wxxx"],
         "4s": ["wwww"],
         rb: ["wxyz"],
       },
-      detailedSuit: "wxyx",
-      items: {
-        AK: [
-          [
-            ["AA", "impossible"],
-            ["AK", "impossible"],
-            ["AQ", "impossible"],
-            ["AJ", "impossible"],
-            ["AT", "impossible"],
-            ["A9", "impossible"],
-            ["A8", "impossible"],
-            ["A7", "impossible"],
-            ["A6", "impossible"],
-            ["A5", "impossible"],
-            ["A4", "impossible"],
-            ["A3", "impossible"],
-            ["A2", "impossible"],
-          ],
-          [
-            ["KK", "impossible"],
-            ["KQ", "impossible"],
-            ["KJ", "impossible"],
-            ["KT", "impossible"],
-            ["K9", "impossible"],
-            ["K8", "impossible"],
-            ["K7", "impossible"],
-            ["K6", "impossible"],
-            ["K5", "impossible"],
-            ["K4", "impossible"],
-            ["K3", "impossible"],
-            ["K2", "impossible"],
-          ],
-          [
-            ["QQ", "impossible"],
-            ["QJ", "rfi-4"],
-            ["QT", "rfi-4"],
-            ["Q9", "rfi-1"],
-            ["Q8", "rfi-1"],
-            ["Q7", "rfi-1"],
-            ["Q6", "rfi-1"],
-            ["Q5", "rfi-1"],
-            ["Q4", "rfi-1"],
-            ["Q3", "rfi-1"],
-            ["Q2", "rfi-1"],
-          ],
-          [
-            ["JJ", "impossible"],
-            ["JT", "rfi-4"],
-            ["J9", "rfi-2"],
-            ["J8", "rfi-1"],
-            ["J7", "rfi-1"],
-            ["J6", "rfi-1"],
-            ["J5", "rfi-1"],
-            ["J4", "rfi-1"],
-            ["J3", "rfi-0"],
-            ["J2", "rfi-0"],
-          ],
-          [
-            ["TT", "impossible"],
-            ["T9", "rfi-2"],
-            ["T8", "rfi-2"],
-            ["T7", "rfi-1"],
-            ["T6", "rfi-1"],
-            ["T5", "rfi-1"],
-            ["T4", "rfi-0"],
-            ["T3", "rfi-0"],
-            ["T2", "rfi-0"],
-          ],
-          [
-            ["99", "impossible"],
-            ["98", "rfi-1"],
-            ["97", "rfi-0"],
-            ["96", "rfi-0"],
-            ["95", "rfi-0"],
-            ["94", "fold"],
-            ["93", "fold"],
-            ["92", "fold"],
-          ],
-          [
-            ["88", "impossible"],
-            ["87", "rfi-1"],
-            ["86", "rfi-0"],
-            ["85", "rfi-0"],
-            ["84", "fold"],
-            ["83", "fold"],
-            ["82", "fold"],
-          ],
-          [
-            ["77", "impossible"],
-            ["76", "rfi-0"],
-            ["75", "rfi-0"],
-            ["74", "rfi-0"],
-            ["73", "fold"],
-            ["72", "fold"],
-          ],
-          [
-            ["66", "impossible"],
-            ["65", "rfi-0"],
-            ["64", "rfi-0"],
-            ["63", "fold"],
-            ["62", "fold"],
-          ],
-          [
-            ["55", "impossible"],
-            ["54", "rfi-1"],
-            ["53", "rfi-0"],
-            ["52", "fold"],
-          ],
-          [
-            ["44", "impossible"],
-            ["43", "rfi-0"],
-            ["42", "fold"],
-          ],
-          [
-            ["33", "impossible"],
-            ["32", "fold"],
-          ],
-          [["22", "impossible"]],
-        ],
-        AQ: [
-          [
-            ["AA", "impossible"],
-            ["AK", "impossible"],
-            ["AQ", "impossible"],
-            ["AJ", "impossible"],
-            ["AT", "impossible"],
-            ["A9", "impossible"],
-            ["A8", "impossible"],
-            ["A7", "impossible"],
-            ["A6", "impossible"],
-            ["A5", "impossible"],
-            ["A4", "impossible"],
-            ["A3", "impossible"],
-            ["A2", "impossible"],
-          ],
-          [
-            ["KK", "impossible"],
-            ["KQ", "impossible"],
-            ["KJ", "impossible"],
-            ["KT", "impossible"],
-            ["K9", "impossible"],
-            ["K8", "impossible"],
-            ["K7", "impossible"],
-            ["K6", "impossible"],
-            ["K5", "impossible"],
-            ["K4", "impossible"],
-            ["K3", "impossible"],
-            ["K2", "impossible"],
-          ],
-          [
-            ["QQ", "impossible"],
-            ["QJ", "impossible"],
-            ["QT", "impossible"],
-            ["Q9", "impossible"],
-            ["Q8", "impossible"],
-            ["Q7", "impossible"],
-            ["Q6", "impossible"],
-            ["Q5", "impossible"],
-            ["Q4", "impossible"],
-            ["Q3", "impossible"],
-            ["Q2", "impossible"],
-          ],
-          [
-            ["JJ", "impossible"],
-            ["JT", "rfi-4"],
-            ["J9", "rfi-1"],
-            ["J8", "rfi-1"],
-            ["J7", "rfi-0"],
-            ["J6", "rfi-0"],
-            ["J5", "rfi-0"],
-            ["J4", "rfi-0"],
-            ["J3", "rfi-0"],
-            ["J2", "rfi-0"],
-          ],
-          [
-            ["TT", "impossible"],
-            ["T9", "rfi-2"],
-            ["T8", "rfi-1"],
-            ["T7", "rfi-0"],
-            ["T6", "rfi-0"],
-            ["T5", "rfi-0"],
-            ["T4", "rfi-0"],
-            ["T3", "rfi-0"],
-            ["T2", "rfi-0"],
-          ],
-          [
-            ["99", "impossible"],
-            ["98", "rfi-0"],
-            ["97", "rfi-0"],
-            ["96", "fold"],
-            ["95", "fold"],
-            ["94", "fold"],
-            ["93", "fold"],
-            ["92", "fold"],
-          ],
-          [
-            ["88", "impossible"],
-            ["87", "rfi-0"],
-            ["86", "rfi-0"],
-            ["85", "fold"],
-            ["84", "fold"],
-            ["83", "fold"],
-            ["82", "fold"],
-          ],
-          [
-            ["77", "impossible"],
-            ["76", "rfi-0"],
-            ["75", "fold"],
-            ["74", "fold"],
-            ["73", "fold"],
-            ["72", "fold"],
-          ],
-          [
-            ["66", "impossible"],
-            ["65", "fold"],
-            ["64", "fold"],
-            ["63", "fold"],
-            ["62", "fold"],
-          ],
-          [
-            ["55", "impossible"],
-            ["54", "rfi-0"],
-            ["53", "fold"],
-            ["52", "fold"],
-          ],
-          [
-            ["44", "impossible"],
-            ["43", "fold"],
-            ["42", "fold"],
-          ],
-          [
-            ["33", "impossible"],
-            ["32", "fold"],
-          ],
-          [["22", "impossible"]],
-        ],
-      },
+
+      // fetched heatmap data
+      heatmap: {},
+
+      // styling variables
+      numRows: 13,
+      numCols: 13,
+      windowWidth: window.innerWidth / 2,
     };
   },
   methods: {
+    handlePositionChange(value) {
+      this.position = value;
+    },
+    handleComboChange(value) {
+      this.showdownCards = value;
+    },
+    handleSuitChange(value) {
+      this.simpleSuit = value;
+      // a few simple suitedness options have only one detailed suitedness option
+      // so just go ahead and set the detailed suitedness to that option for the user
+      if (value === "rb" || value === "4s") {
+        this.detailedSuit = this.simpleDetailArray[value][0];
+      } else {
+        if (!this.simpleDetailArray[value].includes(this.detailedSuit)) {
+          this.detailedSuit = this.simpleDetailArray[value][0];
+        }
+      }
+    },
+    handleDetailChange(value) {
+      this.detailedSuit = value;
+      // a few simple suitedness options have only one detailed suitedness option
+      // so just go ahead and set the single suit to that option for the user
+      if (value === "wxyz") {
+        this.simpleSuit = "rb";
+      } else if (value === "wwww") {
+        this.simpleSuit = "4s";
+      }
+    },
+    async sendPostRequest() {
+      try {
+        const response = await axios.post(
+          "http://localhost:8080/heatmap",
+          {
+            stack_size: "100",
+            rake_structure: "2.5_1.5bb",
+            players: "6",
+            position: this.position,
+            showdown_cards: this.showdownCards,
+            simple_suit: this.simpleSuit,
+            detailed_suit: this.detailedSuit,
+          },
+          { headers: { "Content-Type": "application/json" } }
+        );
+        // Note the use of JSON.parse here. This is because the response.data.map is a stringified JSON object.
+        this.heatmap = JSON.parse(response.data.map);
+      } catch (error) {
+        console.error("There was an error", error);
+      }
+    },
     handleResize() {
       this.windowWidth = window.innerWidth / 2;
-    },
-    positionChanged(position) {
-      this.position = position;
-      console.log(this.position);
-    },
-    comboChanged(combo) {
-      this.combo = combo;
-      console.log(this.combo);
-    },
-    suitChanged(suit) {
-      this.suit = suit;
-      console.log(this.suit);
-    },
-    detailedSuitChanged(detailedSuit) {
-      this.detailedSuit = detailedSuit;
-      console.log(this.detailedSuit);
     },
   },
   mounted() {
@@ -578,6 +275,21 @@ export default {
     window.removeEventListener("resize", this.handleResize);
   },
   computed: {
+    disabledPositions() {
+      return [];
+    },
+    disabledShowdownCards() {
+      return [];
+    },
+    disabledSimpleSuitedness() {
+      return [];
+    },
+    disabledDetailedSuitedness() {
+      let detailSuits = this.detailedSuitednessArray.map((suit) => suit.value);
+      return detailSuits.filter(
+        (suit) => !this.simpleDetailArray[this.simpleSuit].includes(suit)
+      );
+    },
     cellDim() {
       return `${this.windowWidth / this.numRows}px`;
     },
@@ -598,13 +310,6 @@ export default {
       return {
         width: this.cellDim,
       };
-    },
-    mapSelected() {
-      return !!(this.position && this.combo && this.suit && this.detailedSuit);
-    },
-    map() {
-      // Todo: Modify this when using real data
-      return this.items[this.combo];
     },
   },
 };
