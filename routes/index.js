@@ -26,8 +26,8 @@ router.post("/quiz", function (req, res) {
       // Then chose one of the elements randomly to return to client
       let random_quiz =
         quizzes_array[Math.floor(Math.random() * quizzes_array.length)];
-
-      return res.json(random_quiz);
+      // Return the random quiz with a maximum of 20 questions
+      return res.json({ quiz: random_quiz.slice(0, 20), id: result._id });
     }
   });
 });

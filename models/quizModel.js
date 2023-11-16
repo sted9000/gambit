@@ -13,22 +13,20 @@ let quizSchema = new mongoose.Schema({
 
 /*** Create Statics (functions) ***/
 quizSchema.statics.queryForQuiz = function (req, callback) {
-  quizModel.findOne(
-    {
+  quizModel
+    .findOne({
       stack_size: req.body.stack_size,
       rake_structure: req.body.rake_structure,
       players: req.body.players,
       position: req.body.position,
       simple_suit: req.body.simple_suit,
-    },
-    function (err, results) {
-      if (err) {
-        console.error(err);
-      } else {
-        return callback(err, results);
-      }
-    }
-  );
+    })
+    .then((results) => {
+      return callback(null, results);
+    })
+    .catch((err) => {
+      return callback(err);
+    });
 };
 
 /*** Turn Schema into Model ***/

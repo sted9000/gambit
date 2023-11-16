@@ -5,17 +5,18 @@
       name="Position"
       :options="positions"
       :disabledOptions="disabledPositions"
-      @optionChanged="positionChanged"
-      :initialValue="position"
+      :value="position"
+      @change="handlePositionChange"
     />
     <HMSelect
       name="Simple Suitedness"
       :options="simpleSuited"
       :disabledOptions="disabledSimpleSuited"
-      @optionChanged="simpleSuitChanged"
-      :initialValue="simpleSuit"
+      :value="simpleSuit"
+      @change="handleSimpleSuitChange"
     />
   </div>
+  <button @click="sendPostRequest">Send Post Request</button>
 
   <!--  List the quiz questions-->
   <div
@@ -24,7 +25,7 @@
   >
     <QuizQuestion
       v-for="(question, index) in quiz"
-      :key="index"
+      :key="index + '_' + quizId"
       :question="question"
       :name="index.toString()"
       @selectionChanged="
@@ -66,12 +67,14 @@
 <script>
 import HMSelect from "./HMSelect.vue";
 import QuizQuestion from "./QuizQuestion.vue";
+import axios from "axios";
 
 export default {
   name: "Quizzes",
   components: { QuizQuestion, HMSelect },
   data() {
     return {
+      // Positions and simple suitedness arrays
       positions: [
         { label: "EP", value: 0 },
         { label: "MP", value: 1 },
@@ -79,8 +82,6 @@ export default {
         { label: "BTN", value: 3 },
         { label: "SB", value: 4 },
       ],
-      disabledPositions: ["EP", "CO", "BTN", "SB"],
-      position: "1",
       simpleSuited: [
         { label: "Double Suited", value: "ds" },
         { label: "Single Suited", value: "ss" },
@@ -88,12 +89,9 @@ export default {
         { label: "Four to suit", value: "4s" },
         { label: "Rainbow", value: "rb" },
       ],
-      disabledSimpleSuited: [
-        "Double Suited",
-        "Three to suit",
-        "Four to suit",
-        "Rainbow",
-      ],
+
+      // User selected position and simple suitedness
+      position: "1",
       simpleSuit: "ss",
 
       // Object to store the answers to the quiz questions
@@ -106,140 +104,47 @@ export default {
       grade: [],
 
       // Quiz
-      quiz: [
-        {
-          sidecards: "65",
-          isOpen: "true",
-          showdown_cards: "97",
-          detailed_suit: "wxyx",
-        },
-        {
-          sidecards: "76",
-          isOpen: "true",
-          showdown_cards: "T8",
-          detailed_suit: "wxwy",
-        },
-        {
-          sidecards: "97",
-          isOpen: "true",
-          showdown_cards: "KT",
-          detailed_suit: "wxxy",
-        },
-        {
-          sidecards: "32",
-          isOpen: "false",
-          showdown_cards: "K4",
-          detailed_suit: "wxyx",
-        },
-        {
-          sidecards: "AQ",
-          isOpen: "true",
-          showdown_cards: "88",
-          detailed_suit: "wxyx",
-        },
-        {
-          sidecards: "53",
-          isOpen: "false",
-          showdown_cards: "K6",
-          detailed_suit: "wwxy",
-        },
-        {
-          sidecards: "96",
-          isOpen: "false",
-          showdown_cards: "KJ",
-          detailed_suit: "wwxy",
-        },
-        {
-          sidecards: "43",
-          isOpen: "false",
-          showdown_cards: "75",
-          detailed_suit: "wxwy",
-        },
-        {
-          sidecards: "AQ",
-          isOpen: "false",
-          showdown_cards: "22",
-          detailed_suit: "wxxy",
-        },
-        {
-          sidecards: "A9",
-          isOpen: "false",
-          showdown_cards: "33",
-          detailed_suit: "wxyw",
-        },
-        {
-          sidecards: "A5",
-          isOpen: "true",
-          showdown_cards: "22",
-          detailed_suit: "wxyw",
-        },
-        {
-          sidecards: "AQ",
-          isOpen: "false",
-          showdown_cards: "55",
-          detailed_suit: "wxxy",
-        },
-        {
-          sidecards: "32",
-          isOpen: "false",
-          showdown_cards: "A5",
-          detailed_suit: "wxwy",
-        },
-        {
-          sidecards: "74",
-          isOpen: "true",
-          showdown_cards: "A8",
-          detailed_suit: "wxyw",
-        },
-        {
-          sidecards: "AQ",
-          isOpen: "false",
-          showdown_cards: "44",
-          detailed_suit: "wxyx",
-        },
-        {
-          sidecards: "32",
-          isOpen: "false",
-          showdown_cards: "64",
-          detailed_suit: "wxyw",
-        },
-        {
-          sidecards: "32",
-          isOpen: "false",
-          showdown_cards: "64",
-          detailed_suit: "wxyx",
-        },
-        {
-          sidecards: "T7",
-          isOpen: "true",
-          showdown_cards: "QJ",
-          detailed_suit: "wxxy",
-        },
-        {
-          sidecards: "32",
-          isOpen: "false",
-          showdown_cards: "A4",
-          detailed_suit: "wxxy",
-        },
-        {
-          sidecards: "96",
-          isOpen: "false",
-          showdown_cards: "QT",
-          detailed_suit: "wxyx",
-        },
-      ],
+      quiz: [],
+      quizId: "",
     };
   },
   methods: {
-    positionChanged(position) {
-      this.position = position;
+    handlePositionChange(value) {
+      this.position = value;
     },
-    simpleSuitChanged(simpleSuit) {
-      this.simpleSuit = simpleSuit;
+    handleSimpleSuitChange(value) {
+      this.simpleSuit = value;
     },
     handleSelectionChanged(index, value) {
       this.answers[index.toString()] = value;
       console.log(index, value);
+    },
+    async sendPostRequest() {
+      // clean the answers
+      this.answers = Object.assign(
+        {},
+        ...Array.from({ length: 20 }, (v, i) => ({ [i]: null }))
+      );
+      // clean the grade
+      this.grade = [];
+
+      try {
+        const response = await axios.post(
+          "http://localhost:8080/quiz",
+          {
+            stack_size: "100",
+            rake_structure: "2.5_1.5bb",
+            players: "6",
+            position: this.position,
+            simple_suit: this.simpleSuit,
+          },
+          { headers: { "Content-Type": "application/json" } }
+        );
+        this.quiz = response.data.quiz;
+        this.quizId = response.data.id;
+      } catch (error) {
+        console.error("There was an error", error);
+      }
     },
     gradeQuiz() {
       let localGrade = [];
@@ -252,6 +157,12 @@ export default {
     },
   },
   computed: {
+    disabledPositions() {
+      return [];
+    },
+    disabledSimpleSuited() {
+      return [];
+    },
     quizSelected() {
       return this.position !== "" && this.simpleSuit !== "";
     },
@@ -261,10 +172,6 @@ export default {
     gradePercentage() {
       return Math.round((this.grade.filter((x) => x).length / 20) * 100);
     },
-  },
-  mounted() {
-    console.log(this.quiz);
-    console.log(this.quiz.length);
   },
 };
 </script>

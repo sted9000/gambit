@@ -150,11 +150,7 @@ export default {
     },
   },
   computed: {
-    hand() {
-      return this.cardArray.join("");
-    },
     gradeBackgroundColor() {
-      console.log(this.grade);
       if (this.grade) {
         return "bg-green-200";
       } else {
@@ -166,6 +162,7 @@ export default {
     this.cardArray = this.composeCardArray();
     this.suitArray = this.composeSuitArray();
     this.colorArray = this.composeColorArray();
+    console.log("here");
   },
 };
 </script>
