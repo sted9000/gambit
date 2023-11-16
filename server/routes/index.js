@@ -8,8 +8,10 @@ const router = express.Router();
 router.post("/heatmap", function (req, res) {
   heatmapModel.queryForResults(req, (error, result) => {
     if (error) {
+      console.log("Error in heatmap query", error);
       console.error(error);
     } else {
+      console.log(result);
       return res.json(result);
     }
   });

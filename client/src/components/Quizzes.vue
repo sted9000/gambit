@@ -15,8 +15,8 @@
       :value="simpleSuit"
       @change="handleSimpleSuitChange"
     />
+    <PostRequestButton @clicked="sendPostRequest" />
   </div>
-  <button @click="sendPostRequest">Send Post Request</button>
 
   <!--  List the quiz questions-->
   <div
@@ -39,12 +39,10 @@
   <div class="flex justify-center mt-8">
     <button
       :class="[
-        'text-xl',
-        'font-medium',
-        'rounded-lg',
-        'px-8',
-        'py-4',
-        allAnswersSelected ? 'bg-green-400' : 'bg-gray-300',
+        'shadow-xl text-white font-bold rounded-full p-4 w-36',
+        allAnswersSelected
+          ? 'bg-indigo-600 hover:bg-indigo-500'
+          : 'bg-gray-300',
       ]"
       :disabled="!allAnswersSelected"
       @click="gradeQuiz"
@@ -68,10 +66,11 @@
 import HMSelect from "./HMSelect.vue";
 import QuizQuestion from "./QuizQuestion.vue";
 import axios from "axios";
+import PostRequestButton from "./PostRequestButton.vue";
 
 export default {
   name: "Quizzes",
-  components: { QuizQuestion, HMSelect },
+  components: { PostRequestButton, QuizQuestion, HMSelect },
   data() {
     return {
       // Positions and simple suitedness arrays
