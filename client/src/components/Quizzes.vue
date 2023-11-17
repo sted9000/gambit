@@ -129,7 +129,7 @@ export default {
 
       try {
         const response = await axios.post(
-          "http://localhost:8080/quiz",
+          "/quiz",
           {
             stack_size: "100",
             rake_structure: "2.5_1.5bb",

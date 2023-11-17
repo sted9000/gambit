@@ -246,7 +246,7 @@ export default {
     async sendPostRequest() {
       try {
         const response = await axios.post(
-          "http://localhost:8080/heatmap",
+          "/heatmap",
           {
             stack_size: "100",
             rake_structure: "2.5_1.5bb",
