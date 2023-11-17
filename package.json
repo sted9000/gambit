@@ -8,8 +8,9 @@
   "scripts": {
     "start": "node server/app.js",
     "dev": "cd client && vite",
-    "build": "cd client && vite build",
-    "preview": "cd client && vite preview"
+    "build": "cd client && npm install && vite build",
+    "preview": "cd client && vite preview",
+    "heroku-postbuild": "npm run build"
   },
   "dependencies": {
     "axios": "^1.6.2",
