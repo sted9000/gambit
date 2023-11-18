@@ -4,7 +4,7 @@
     <nav>
       <div class="flex justify-center items-center">
         <a
-          href="https://github.com/sted9000/gambit"
+          href="https://github.com/sted9000/gambit#description"
           rel="noopener noreferrer"
           class="text-lg font-bold text-gray-800 mx-4"
           >About</a

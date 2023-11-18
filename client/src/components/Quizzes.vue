@@ -1,6 +1,7 @@
 <template>
   <!--  Select the parameters of the quiz-->
   <div class="flex justify-center my-4">
+
     <HMSelect
       name="Position"
       :options="positions"
@@ -15,12 +16,13 @@
       :value="simpleSuit"
       @change="handleSimpleSuitChange"
     />
-    <PostRequestButton @clicked="sendPostRequest" />
+    <PostRequestButton @clicked="sendPostRequest" text="Generate" />
   </div>
 
   <!--  List the quiz questions-->
+  <div class="flex justify-center my-8">
   <div
-    v-if="quizSelected"
+    v-if="quiz.length"
     class="container mx-auto grid grid-cols-2 lg:grid-cols-4 gap-4"
   >
     <QuizQuestion
@@ -33,32 +35,36 @@
       "
       :grade="index >= 0 && index < grade.length ? grade[index] : null"
     />
-  </div>
 
-  <!--  Grade the quiz-->
-  <div class="flex justify-center mt-8">
-    <button
-      :class="[
+<!--    Grade the quiz-->
+    <div class="flex justify-center mt-8">
+      <button
+          :class="[
         'shadow-xl text-white font-bold rounded-full p-4 w-36',
         allAnswersSelected
           ? 'bg-indigo-600 hover:bg-indigo-500'
           : 'bg-gray-300',
       ]"
-      :disabled="!allAnswersSelected"
-      @click="gradeQuiz"
-    >
-      Grade Quiz
-    </button>
+          :disabled="!allAnswersSelected"
+          @click="gradeQuiz"
+      >
+        Grade Quiz
+      </button>
+    </div>
+
+    <!--  Display the grade-->
+    <div v-if="grade.length > 0">
+      <div class="flex justify-center mt-4">
+        <p>Grade: {{ grade.filter((x) => x).length }} / 20</p>
+      </div>
+      <div class="flex justify-center">
+        <p>Percentage: {{ gradePercentage }}%</p>
+      </div>
+    </div>
+
   </div>
 
-  <!--  Display the grade-->
-  <div v-if="grade.length > 0">
-    <div class="flex justify-center mt-4">
-      <p>Grade: {{ grade.filter((x) => x).length }} / 20</p>
-    </div>
-    <div class="flex justify-center">
-      <p>Percentage: {{ gradePercentage }}%</p>
-    </div>
+  <NoDataMessage v-else text="Enter parameters and click load to generate a Quiz!" />
   </div>
 </template>
 
@@ -67,10 +73,11 @@ import HMSelect from "./HMSelect.vue";
 import QuizQuestion from "./QuizQuestion.vue";
 import axios from "axios";
 import PostRequestButton from "./PostRequestButton.vue";
+import NoDataMessage from "./NoDataMessage.vue";
 
 export default {
   name: "Quizzes",
-  components: { PostRequestButton, QuizQuestion, HMSelect },
+  components: { PostRequestButton, QuizQuestion, HMSelect, NoDataMessage },
   data() {
     return {
       // Positions and simple suitedness arrays
@@ -129,7 +136,7 @@ export default {
 
       try {
         const response = await axios.post(
-          "/quiz",
+          `${import.meta.env.VITE_BASE_URL}/quiz`,
           {
             stack_size: "100",
             rake_structure: "2.5_1.5bb",

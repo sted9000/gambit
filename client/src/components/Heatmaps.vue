@@ -28,12 +28,15 @@
       :value="detailedSuit"
       @change="handleDetailChange"
     />
+
+    <PostRequestButton @clicked="sendPostRequest" text="Load" />
   </div>
 
-  <button @click="sendPostRequest">Send Post Request</button>
 
   <div class="flex justify-center my-8">
-    <div :style="gridContainerStyle">
+
+<!--    Heatmap and Legend-->
+    <div v-if="heatmap" :style="gridContainerStyle">
       <div v-for="(row, rowIndex) in heatmap" :key="rowIndex" :style="rowStyle">
         <div
           v-for="(col, colIndex) in row"
@@ -50,7 +53,9 @@
       </div>
 
       <Legend />
+
     </div>
+    <NoDataMessage v-else text="Enter parameters and click load to view a Heatmap!" />
   </div>
 </template>
 
@@ -58,11 +63,13 @@
 import ComboCell from "./ComboCell.vue";
 import Legend from "./Legend.vue";
 import HMSelect from "./HMSelect.vue";
+import PostRequestButton from "./PostRequestButton.vue";
 import axios from "axios";
+import NoDataMessage from "./NoDataMessage.vue";
 
 export default {
   name: "Header",
-  components: { HMSelect, ComboCell, Legend },
+  components: {NoDataMessage, HMSelect, ComboCell, Legend, PostRequestButton },
   data() {
     return {
       // set options for position, combo, simple suitedness, and detailed suitedness
@@ -206,7 +213,7 @@ export default {
       },
 
       // fetched heatmap data
-      heatmap: {},
+      heatmap: null,
 
       // styling variables
       numRows: 13,
@@ -246,7 +253,7 @@ export default {
     async sendPostRequest() {
       try {
         const response = await axios.post(
-          "/heatmap",
+          `${import.meta.env.VITE_BASE_URL}/heatmap`,
           {
             stack_size: "100",
             rake_structure: "2.5_1.5bb",
