@@ -13,12 +13,8 @@ app.use(cors()); // Dev only
 app.use(express.json()); // Parse JSON bodies
 
 // Connect to MongoDB
-// .connect(process.env.MONGO_URI, {})
 mongoose
-  .connect(
-    "mongodb+srv://gambit-user:XACkRv57F5RQ4gig@gambit-free.zcqjmlq.mongodb.net/gambitPLO?retryWrites=true&w=majority",
-    {}
-  )
+  .connect(process.env.MONGO_URI, {})
   .then(() => console.log("Connected to MongoDB..."))
   .catch((err) => console.error("Could not connect to MongoDB...", err));
 
