@@ -22,8 +22,13 @@ In order for the solver data to be useful, it needed to be manipulated and forma
 ### 3 - Store, Host, and Display Data
 I used [MongoDB's Atlas](https://www.mongodb.com/atlas) to store the data. I built a simple backend with [ExpressJS](https://expressjs.com/). The frontend is built with [Vue](https://vuejs.org/). The app is hosted on [Heroku](https://www.heroku.com/).
 
+## Resources
+- The processed data is in the `resources/data` folder.
+- The Jupyter Notebook used to process the raw data are in the `resources/notebook` folder.
+- Scripts to scrape the data from the MonkerSolver files are in the `resources/scripts` folder.
+
 ## Todo
-- [ ] Add more resources to repo (notebooks, raw data, etc.)
+- [ ] Add "Buy me a coffee" link
 - [ ] Add Auth Provider
 - [ ] Update UI with for more context for users (rake, stack size, etc.)
 - [ ] Feature: Shareable links with and query params

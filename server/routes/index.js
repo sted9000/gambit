@@ -8,10 +8,8 @@ const router = express.Router();
 router.post("/heatmap", function (req, res) {
   heatmapModel.queryForResults(req, (error, result) => {
     if (error) {
-      console.log("Error in heatmap query", error);
       console.error(error);
     } else {
-      console.log(result);
       return res.json(result);
     }
   });
@@ -22,14 +20,20 @@ router.post("/quiz", function (req, res) {
     if (error) {
       console.error(error);
     } else {
-      /*** Hacking here ***/
-      // Need to turn quizzes string into array
-      let quizzes_array = JSON.parse(result.quizzes);
-      // Then chose one of the elements randomly to return to client
-      let random_quiz =
-        quizzes_array[Math.floor(Math.random() * quizzes_array.length)];
+      // get the quizzes array from the result
+      let quizzes = result.quizzes;
+
+      // turn quizzes into an array
+      quizzes = JSON.parse(quizzes);
+
+      // select a random index from the array
+      let randomIndex = Math.floor(Math.random() * quizzes.length);
+
+      // Select a random quiz from the results
+      let quiz = quizzes[randomIndex];
+
       // Return the random quiz with a maximum of 20 questions
-      return res.json({ quiz: random_quiz.slice(0, 20), id: result._id });
+      return res.json({ quiz: quiz.slice(0, 20), id: randomIndex });
     }
   });
 });

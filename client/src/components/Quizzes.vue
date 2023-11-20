@@ -1,7 +1,6 @@
 <template>
   <!--  Select the parameters of the quiz-->
   <div class="flex justify-center my-4">
-
     <HMSelect
       name="Position"
       :options="positions"
@@ -21,51 +20,53 @@
 
   <!--  List the quiz questions-->
   <div class="flex justify-center my-8">
-  <div
-    v-if="quiz.length"
-    class="container mx-auto grid grid-cols-2 lg:grid-cols-4 gap-4"
-  >
-    <QuizQuestion
-      v-for="(question, index) in quiz"
-      :key="index + '_' + quizId"
-      :question="question"
-      :name="index.toString()"
-      @selectionChanged="
-        (eventValue) => handleSelectionChanged(index, eventValue)
-      "
-      :grade="index >= 0 && index < grade.length ? grade[index] : null"
-    />
+    <div
+      v-if="quiz.length"
+      class="container mx-auto grid grid-cols-2 lg:grid-cols-4 gap-4"
+    >
+      <QuizQuestion
+        v-for="(question, index) in quiz"
+        :key="index + '_' + quizId"
+        :question="question"
+        :name="index.toString()"
+        @selectionChanged="
+          (eventValue) => handleSelectionChanged(index, eventValue)
+        "
+        :grade="index >= 0 && index < grade.length ? grade[index] : null"
+      />
+    </div>
+  </div>
 
-<!--    Grade the quiz-->
-    <div class="flex justify-center mt-8">
-      <button
-          :class="[
+  <!--    Grade the quiz-->
+  <div v-if="quiz.length" class="flex justify-center mt-8">
+    <button
+      :class="[
         'shadow-xl text-white font-bold rounded-full p-4 w-36',
         allAnswersSelected
           ? 'bg-indigo-600 hover:bg-indigo-500'
           : 'bg-gray-300',
       ]"
-          :disabled="!allAnswersSelected"
-          @click="gradeQuiz"
-      >
-        Grade Quiz
-      </button>
-    </div>
-
-    <!--  Display the grade-->
-    <div v-if="grade.length > 0">
-      <div class="flex justify-center mt-4">
-        <p>Grade: {{ grade.filter((x) => x).length }} / 20</p>
-      </div>
-      <div class="flex justify-center">
-        <p>Percentage: {{ gradePercentage }}%</p>
-      </div>
-    </div>
-
+      :disabled="!allAnswersSelected"
+      @click="gradeQuiz"
+    >
+      Grade Quiz
+    </button>
   </div>
 
-  <NoDataMessage v-else text="Enter parameters and click load to generate a Quiz!" />
+  <!--  Display the grade-->
+  <div v-if="grade.length > 0">
+    <div class="flex justify-center mt-4">
+      <p>Grade: {{ grade.filter((x) => x).length }} / 20</p>
+    </div>
+    <div class="flex justify-center">
+      <p>Percentage: {{ gradePercentage }}%</p>
+    </div>
   </div>
+
+  <NoDataMessage
+    v-if="!quiz.length"
+    text="Enter parameters and click load to generate a Quiz!"
+  />
 </template>
 
 <script>
@@ -148,6 +149,7 @@ export default {
         );
         this.quiz = response.data.quiz;
         this.quizId = response.data.id;
+        console.log(this.quiz, this.quizId);
       } catch (error) {
         console.error("There was an error", error);
       }

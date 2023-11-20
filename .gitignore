@@ -29,3 +29,5 @@ coverage
 
 .env
 .env.production
+**/__pycache__/
+```
