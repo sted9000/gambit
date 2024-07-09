@@ -1,6 +1,7 @@
 # gambit
 [GambitPLO.com](https://gambitplo.com/) is up and running and FREE to use.
 
+![Demo](./assets/demo.gif)
 ## Description
 A tool for learning Pot Limit Omaha opening ranges utilizing Heatmaps.
 
