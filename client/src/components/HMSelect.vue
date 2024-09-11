@@ -1,15 +1,15 @@
 <!--Note: These are presentational components, so they don't have any data or methods. They just receive props and emit events.-->
 <template>
-  <div class="relative inline-block text-left mx-2">
-    <label for="options" class="block text-sm font-medium text-gray-700">{{
+  <div class="relative inline-block text-left">
+    <label :for="name" class="block text-sm font-medium text-gray-700 mb-1">{{
       name
     }}</label>
-      <select
-        id="options"
-        :value="value"
-        @change.stop="onChange($event)"
-        class="block w-full pl-1 pr-2 py-1 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-      >
+    <select
+      :id="name"
+      :value="value"
+      @change.stop="onChange($event)"
+      class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md shadow-sm"
+    >
       <option disabled value="">Please select one</option>
       <option
         v-for="(option, index) in options"

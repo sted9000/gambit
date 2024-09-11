@@ -1,0 +1,59 @@
+.animated-text {
+  background: linear-gradient(
+    to right,
+    #f79533,
+    #f37055,
+    #ef4e7b,
+    #a166ab,
+    #5073b8,
+    #1098ad,
+    #07b39b,
+    #6fba82,
+    #f79533
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  background-size: 900% auto;
+  animation: textFlow 10s linear infinite;
+}
+
+.animated-button {
+  background: linear-gradient(
+    to right,
+    #6fba82,
+    #07b39b,
+    #1098ad,
+    #5073b8,
+    #a166ab,
+    #ef4e7b,
+    #f37055,
+    #f79533,
+    #6fba82
+  );
+  background-size: 900% auto;
+  animation: buttonFlow 20s linear infinite;
+  transition: filter 0.3s ease;
+}
+
+.animated-button:hover {
+  filter: brightness(1.2);
+}
+
+@keyframes textFlow {
+  0% {
+    background-position: 0% center;
+  }
+  100% {
+    background-position: -100% center;
+  }
+}
+
+@keyframes buttonFlow {
+  0% {
+    background-position: 100% center;
+  }
+  100% {
+    background-position: 0% center;
+  }
+}

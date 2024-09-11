@@ -33,7 +33,7 @@ router.post("/quiz", function (req, res) {
       let quiz = quizzes[randomIndex];
 
       // Return the random quiz with a maximum of 20 questions
-      return res.json({ quiz: quiz.slice(0, 20), id: randomIndex });
+      return res.json({ quiz: quiz.slice(0, 5), id: randomIndex });
     }
   });
 });

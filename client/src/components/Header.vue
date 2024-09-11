@@ -1,31 +1,36 @@
 <template>
-  <header class="flex justify-between items-center py-4 px-8 bg-green-400">
-    <h1 class="text-4xl font-bold text-gray-800">{{ name }}</h1>
-    <nav>
-      <div class="flex justify-center items-center">
-        <a
-          href="https://github.com/sted9000/gambit#description"
-          rel="noopener noreferrer"
-          class="text-lg font-bold text-gray-800 mx-4"
-          >About</a
-        >
-        <a href="https://github.com/sted9000/gambit" rel="noopener noreferrer">
-          <img
-            src="../assets/github-mark.png"
-            alt="Github Logo"
-            class="h-8 mx-4"
-          />
-        </a>
+  <header class="max-w-6xl mx-auto bg-gray-50 px-4 sm:px-6 lg:px-8 w-full">
+    <div class="flex justify-between items-center py-4">
+      <div class="flex-shrink-0">
+        <div class="relative">
+          <div class="text-2xl font-bold animated-text">
+            {{ APP_NAME }}
+          </div>
+          <span
+            class="absolute right-0 -bottom-3 text-[0.6rem] text-gray-500 hidden sm:inline"
+            >by {{ SPONSOR }}</span
+          >
+        </div>
       </div>
-    </nav>
+      <nav>
+        <a
+          :href="GITHUB_LINK"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-gray-600 hover:text-gray-900 font-medium"
+        >
+          About
+        </a>
+      </nav>
+    </div>
   </header>
 </template>
 
-<script>
-export default {
-  name: "Header",
-  props: {
-    name: String,
-  },
-};
+<script setup>
+import "@/assets/css/animatedText.css";
+import { APP_NAME, SPONSOR, GITHUB_LINK } from "@/constants";
+
+const props = defineProps({
+  name: String,
+});
 </script>
